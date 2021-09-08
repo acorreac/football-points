@@ -1,10 +1,16 @@
-# football_points
+# Football_Points
 
-A new Flutter project.
+Desafio do site edabit.com implementado no flutter.
+
 
 ## Getting Started
 
-This project is a starting point for a Flutter application.
+Este projeto tem como objetivo mostrar uma possível solução para o desafio feito em flutter.
+
+![home_desafio](https://user-images.githubusercontent.com/57640979/132441635-d55d84f1-16f7-4ceb-b407-63e8a9a1b1c1.png)
+
+![tela_classificacao](https://user-images.githubusercontent.com/57640979/132441841-2979adac-ee58-427b-b0d7-97002fa5404d.png)
+
 
 A few resources to get you started if this is your first Flutter project:
 
