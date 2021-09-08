@@ -101,15 +101,14 @@ class _HomeState extends State<Home> {
                 style: GoogleFonts.sourceSansPro(
                     fontSize: 20.0, fontWeight: FontWeight.w600),
               ),
-              Center(
-                child: UltimoJogo(onSelect: (resultado) {
-                  setState(() {
-                    this.resultadoDaPartida = resultado;
-                    this.habilitaBotao();
-                  });
-                }),
-              ),
+              Center(child: UltimoJogo(onSelect: (resultado) {
+                setState(() {
+                  this.resultadoDaPartida = resultado;
+                  this.habilitaBotao();
+                });
+              })),
               Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
@@ -124,7 +123,7 @@ class _HomeState extends State<Home> {
                           context,
                           MaterialPageRoute(
                             builder: (context) => TelaResultado(
-                              title: 'Tabela de Pontos',
+                              title: 'Tabela de Classificação',
                               listaDeTimes: this.listaDeTimes,
                             ),
                           ),
@@ -146,7 +145,7 @@ class _HomeState extends State<Home> {
                         context,
                         MaterialPageRoute(
                           builder: (context) => TelaResultado(
-                            title: 'Tabela de Pontos',
+                            title: 'Tabela de Classificação',
                             listaDeTimes: this.listaDeTimes,
                           ),
                         ),
@@ -189,6 +188,7 @@ class _UltimoJogoState extends State<UltimoJogo> {
   @override
   Widget build(BuildContext context) {
     return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
         ListTile(
           title: const Text('Ganhou'),

@@ -85,6 +85,8 @@ class _TelaResultadoState extends State<TelaResultado> {
         children: [
           Table(
             children: recuperaLinhasTabela(),
+            border: TableBorder(
+                horizontalInside: BorderSide(width: 1, color: Colors.blueGrey)),
           ),
           Center(
             child: ElevatedButton(
