@@ -7,7 +7,9 @@ Desafio do site edabit.com implementado no flutter.
 
 Este projeto tem como objetivo mostrar uma possível solução para o desafio feito em flutter.
 
-![home_desafio](https://user-images.githubusercontent.com/57640979/132441635-d55d84f1-16f7-4ceb-b407-63e8a9a1b1c1.png)
+![tela_home](https://user-images.githubusercontent.com/57640979/132517099-b61d1ceb-d765-4131-99d0-a1e028833991.png)
+
+
 
 ![tela_classificacao](https://user-images.githubusercontent.com/57640979/132441841-2979adac-ee58-427b-b0d7-97002fa5404d.png)
 
