@@ -1,7 +1,12 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:football_points/classes/estado_partida.dart';
 import 'package:football_points/classes/jogo.dart';
+import 'package:football_points/classes/time.dart';
 import 'package:football_points/result.dart';
+import 'package:football_points/tela_login.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import 'classes/lista_jogos.dart';
@@ -13,155 +18,228 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  List<String> listaDeTimes = [''];
-  String timeSelecionado = '';
+  Set<Time> listaDeTimes = Set();
+  Time timeSelecionado = Time.toTimeSemEscudo('');
   bool botaoAtualizaHabilitado = false;
-  EstadoPatida resultadoDaPartida = EstadoPatida.na;
+  EstadoPartida resultadoDaPartida = EstadoPartida.naoSelecionado;
 
   _HomeState() {
     carregaTimes();
   }
 
   void carregaTimes() {
-    ListaTimes.recuperaListaDeTimes()
-        .then((times) => {this.listaDeTimes = times, setState(() {})});
+    ListaTimes.recuperaListaDeTimes().then((times) => {
+          this.listaDeTimes = times.toSet(),
+          setState(() {}),
+          this.timeSelecionado =
+              listaDeTimes.firstWhere((time) => time.nome.isEmpty)
+        });
   }
 
   void habilitaBotao() {
-    this.botaoAtualizaHabilitado = this.timeSelecionado.isNotEmpty &&
-        this.resultadoDaPartida != EstadoPatida.na;
+    this.botaoAtualizaHabilitado = this.timeSelecionado.nome.isNotEmpty &&
+        this.resultadoDaPartida != EstadoPartida.naoSelecionado;
   }
 
   @override
   Widget build(BuildContext context) {
-    final ButtonStyle style =
-        ElevatedButton.styleFrom(textStyle: const TextStyle(fontSize: 20));
     return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          'Home',
-          style: GoogleFonts.sourceSansPro(
-            textStyle: TextStyle(
-              fontSize: 35,
-              color: Colors.white,
-            ),
+      body: Container(
+        padding: EdgeInsets.symmetric(vertical: 150.h),
+        decoration: BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage("images/plano-fundo-home.jpg"),
+            fit: BoxFit.fill,
           ),
         ),
-        leading: Icon(
-          Icons.sports_soccer,
-          color: Colors.white,
-          size: 30.0,
-        ),
-      ),
-      body: Container(
-        margin: EdgeInsets.only(left: 30, top: 50, right: 30, bottom: 50),
-        width: MediaQuery.of(context).size.width,
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(10),
-              topRight: Radius.circular(10),
-              bottomLeft: Radius.circular(10),
-              bottomRight: Radius.circular(10)),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.grey.withOpacity(0.5),
-              spreadRadius: 5,
-              blurRadius: 7,
-              offset: Offset(0, 3), // changes position of shadow
-            ),
-          ],
-        ),
         child: Container(
-          margin:
-              EdgeInsets.only(left: 3.0, top: 15.0, right: 3.0, bottom: 3.0),
-          child: Column(
-            children: [
-              Text(
-                'Escolha o time?',
-                style: GoogleFonts.sourceSansPro(
-                    fontSize: 20.0, fontWeight: FontWeight.w600),
-              ),
-              DropdownButton<String>(
-                  value: timeSelecionado,
-                  items: listaDeTimes.map((nome) {
-                    return DropdownMenuItem<String>(
-                      value: nome,
-                      child: Text(nome),
-                    );
-                  }).toList(),
-                  onChanged: (String? content) {
-                    setState(() {
-                      this.timeSelecionado = content!;
-                      this.habilitaBotao();
-                    });
-                  }),
-              Text(
-                'O time ganhou, empatou ou perdeu o último jogo?',
-                style: GoogleFonts.sourceSansPro(
-                    fontSize: 20.0, fontWeight: FontWeight.w600),
-              ),
-              Center(child: UltimoJogo(onSelect: (resultado) {
-                setState(() {
-                  this.resultadoDaPartida = resultado;
-                  this.habilitaBotao();
-                });
-              })),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      primary:
-                          botaoAtualizaHabilitado ? Colors.blue : Colors.grey,
+          child: Center(
+            child: Column(
+              children: [
+                Container(
+                  child: Card(
+                    color: Colors.white.withOpacity(0.5),
+                    margin: EdgeInsets.symmetric(
+                      vertical: 10.h,
+                      horizontal: 540.w,
                     ),
-                    onPressed: () {
-                      if (botaoAtualizaHabilitado) {
-                        Jogo jogo = Jogo(timeSelecionado, resultadoDaPartida);
-                        ListaDeJogos.getInstance().adicionaJogo(jogo);
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => TelaResultado(
-                              title: 'Tabela de Classificação',
-                              listaDeTimes: this.listaDeTimes,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30),
+                    ),
+                    child: Container(
+                      padding: EdgeInsets.symmetric(
+                          vertical: 10.h, horizontal: 100.w),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Text(
+                            'Escolha o time!',
+                            textAlign: TextAlign.center,
+                            style: GoogleFonts.newsCycle(
+                                color: Colors.black,
+                                fontSize: 50.sp,
+                                fontWeight: FontWeight.bold),
+                          ),
+                          Padding(
+                            padding: EdgeInsets.only(bottom: 15),
+                          ),
+                          Form(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.spaceAround,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                DropdownButton<Time>(
+                                  dropdownColor: Colors.white.withOpacity(0.8),
+                                  icon: Icon(
+                                    Icons.sports_soccer_outlined,
+                                    color: Colors.green,
+                                  ),
+                                  value: timeSelecionado,
+                                  items: listaDeTimes.map(
+                                    (time) {
+                                      return DropdownMenuItem<Time>(
+                                        value: time,
+                                        child: Text(
+                                          time.nome.toUpperCase(),
+                                          style: GoogleFonts.newsCycle(
+                                              fontSize: 30.sp,
+                                              fontWeight: FontWeight.w700,
+                                              color: Colors.black),
+                                        ),
+                                      );
+                                    },
+                                  ).toList(),
+                                  onChanged: (Time? content) {
+                                    setState(
+                                      () {
+                                        this.timeSelecionado = content!;
+                                        this.habilitaBotao();
+                                      },
+                                    );
+                                  },
+                                ),
+                                Padding(
+                                  padding: EdgeInsets.only(bottom: 15),
+                                ),
+                                Text(
+                                  'O time ganhou, empatou ou perdeu o último jogo?',
+                                  style: GoogleFonts.newsCycle(
+                                      fontSize: 30.sp,
+                                      fontWeight: FontWeight.w800,
+                                      color: Colors.black),
+                                  textAlign: TextAlign.center,
+                                ),
+                                Padding(
+                                  padding: EdgeInsets.only(bottom: 15),
+                                ),
+                                Container(
+                                  padding:
+                                      EdgeInsets.symmetric(horizontal: 230.h),
+                                  child: UltimoJogo(
+                                    onSelect: (resultado) {
+                                      setState(
+                                        () {
+                                          this.resultadoDaPartida = resultado;
+                                          this.habilitaBotao();
+                                        },
+                                      );
+                                    },
+                                  ),
+                                ),
+                                Padding(
+                                  padding: EdgeInsets.only(bottom: 15),
+                                ),
+                                Column(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceAround,
+                                  crossAxisAlignment:
+                                      CrossAxisAlignment.stretch,
+                                  children: [
+                                    ElevatedButton(
+                                      style: ElevatedButton.styleFrom(
+                                        padding: EdgeInsets.only(
+                                            top: 15.h, bottom: 15.h),
+                                        primary: botaoAtualizaHabilitado
+                                            ? Colors.green
+                                            : Colors.grey,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(50),
+                                        ),
+                                      ),
+                                      onPressed: () {
+                                        if (botaoAtualizaHabilitado) {
+                                          Jogo jogo = Jogo(
+                                              time: timeSelecionado,
+                                              resultado: resultadoDaPartida);
+                                          ListaDeJogos.getInstance()
+                                              .adicionaJogo(jogo);
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) =>
+                                                  TelaResultado(
+                                                listaDeTimes:
+                                                    this.listaDeTimes.toList(),
+                                              ),
+                                            ),
+                                          );
+                                        }
+                                      },
+                                      child: Text(
+                                        'ATUALIZAR TABELA DE PONTOS',
+                                        style: GoogleFonts.newsCycle(
+                                            fontSize: 30.sp,
+                                            fontWeight: FontWeight.w600,
+                                            color: Colors.white),
+                                        textAlign: TextAlign.center,
+                                      ),
+                                    ),
+                                    Padding(
+                                      padding: EdgeInsets.only(bottom: 15),
+                                    ),
+                                    ElevatedButton(
+                                      style: ElevatedButton.styleFrom(
+                                        padding: EdgeInsets.only(
+                                            top: 15.h, bottom: 15.h),
+                                        primary: Colors.black,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(50),
+                                        ),
+                                      ),
+                                      onPressed: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) => TelaLogin(),
+                                          ),
+                                        );
+                                      },
+                                      child: Text(
+                                        'VOLTAR',
+                                        style: GoogleFonts.newsCycle(
+                                            fontSize: 30.sp,
+                                            fontWeight: FontWeight.w600,
+                                            color: Colors.white),
+                                        textAlign: TextAlign.center,
+                                      ),
+                                    ),
+                                    Padding(
+                                      padding: EdgeInsets.only(bottom: 15),
+                                    ),
+                                  ],
+                                ),
+                              ],
                             ),
                           ),
-                        );
-                      }
-                    },
-                    child: Text(
-                      'Atualizar Tabela de Pontos',
-                      style: GoogleFonts.sourceSansPro(
-                          fontSize: 20.0,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.white),
+                        ],
+                      ),
                     ),
                   ),
-                  ElevatedButton(
-                    style: style,
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => TelaResultado(
-                            title: 'Tabela de Classificação',
-                            listaDeTimes: this.listaDeTimes,
-                          ),
-                        ),
-                      );
-                    },
-                    child: Text(
-                      'Ver Classificação',
-                      style: GoogleFonts.sourceSansPro(
-                          fontSize: 20.0,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.white),
-                    ),
-                  ),
-                ],
-              ),
-            ],
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -170,7 +248,7 @@ class _HomeState extends State<Home> {
 }
 
 class UltimoJogo extends StatefulWidget {
-  final ValueChanged<EstadoPatida> onSelect;
+  final ValueChanged<EstadoPartida> onSelect;
 
   UltimoJogo({Key? key, required this.onSelect}) : super(key: key);
 
@@ -178,58 +256,79 @@ class UltimoJogo extends StatefulWidget {
   State<UltimoJogo> createState() => _UltimoJogoState(onSelect: this.onSelect);
 }
 
-/// This is the private State class that goes with MyStatefulWidget.
 class _UltimoJogoState extends State<UltimoJogo> {
-  final ValueChanged<EstadoPatida> onSelect;
-  EstadoPatida _resultado = EstadoPatida.na;
+  final ValueChanged<EstadoPartida> onSelect;
+  EstadoPartida _resultado = EstadoPartida.naoSelecionado;
 
   _UltimoJogoState({required this.onSelect});
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: <Widget>[
-        ListTile(
-          title: const Text('Ganhou'),
-          leading: Radio<EstadoPatida>(
-            value: EstadoPatida.ganhou,
-            groupValue: _resultado,
-            onChanged: (value) {
-              setState(() {
-                _resultado = value!;
-                this.onSelect(_resultado);
-              });
-            },
+    return Container(
+      child: Column(
+        children: <Widget>[
+          ListTile(
+            title: Text(
+              'Ganhou',
+              style: GoogleFonts.newsCycle(
+                  fontSize: 30.sp,
+                  fontWeight: FontWeight.w800,
+                  color: Colors.black),
+            ),
+            leading: Radio<EstadoPartida>(
+              activeColor: Colors.green,
+              value: EstadoPartida.ganhou,
+              groupValue: _resultado,
+              onChanged: (value) {
+                setState(() {
+                  _resultado = value!;
+                  this.onSelect(_resultado);
+                });
+              },
+            ),
           ),
-        ),
-        ListTile(
-          title: const Text('Empatou'),
-          leading: Radio<EstadoPatida>(
-            value: EstadoPatida.empatou,
-            groupValue: _resultado,
-            onChanged: (value) {
-              setState(() {
-                _resultado = value!;
-                this.onSelect(_resultado);
-              });
-            },
+          ListTile(
+            title: Text(
+              'Empatou',
+              style: GoogleFonts.newsCycle(
+                  fontSize: 30.sp,
+                  fontWeight: FontWeight.w800,
+                  color: Colors.black),
+            ),
+            leading: Radio<EstadoPartida>(
+              activeColor: Colors.green,
+              value: EstadoPartida.empatou,
+              groupValue: _resultado,
+              onChanged: (value) {
+                setState(() {
+                  _resultado = value!;
+                  this.onSelect(_resultado);
+                });
+              },
+            ),
           ),
-        ),
-        ListTile(
-          title: const Text('Perdeu'),
-          leading: Radio<EstadoPatida>(
-            value: EstadoPatida.perdeu,
-            groupValue: _resultado,
-            onChanged: (value) {
-              setState(() {
-                _resultado = value!;
-                this.onSelect(_resultado);
-              });
-            },
+          ListTile(
+            title: Text(
+              'Perdeu',
+              style: GoogleFonts.newsCycle(
+                  fontSize: 30.sp,
+                  fontWeight: FontWeight.w800,
+                  color: Colors.black),
+            ),
+            leading: Radio<EstadoPartida>(
+              activeColor: Colors.green,
+              value: EstadoPartida.perdeu,
+              groupValue: _resultado,
+              onChanged: (value) {
+                setState(() {
+                  _resultado = value!;
+                  this.onSelect(_resultado);
+                });
+              },
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }

@@ -1,15 +1,15 @@
 import 'package:football_points/classes/jogo.dart';
 
 class ListaDeJogos {
-  static ListaDeJogos? _intancia;
+  static ListaDeJogos? _instancia;
 
   List<Jogo> _jogos = [];
 
   static getInstance() {
-    if (_intancia == null) {
-      _intancia = new ListaDeJogos();
+    if (_instancia == null) {
+      _instancia = new ListaDeJogos();
     }
-    return _intancia;
+    return _instancia;
   }
 
   void adicionaJogo(Jogo jogo) {

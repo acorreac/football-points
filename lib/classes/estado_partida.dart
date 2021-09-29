@@ -1,1 +1,2 @@
-enum EstadoPatida { ganhou, empatou, perdeu, na }
+//seleção do estado da partida
+enum EstadoPartida { ganhou, empatou, perdeu, naoSelecionado }

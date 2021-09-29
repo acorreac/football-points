@@ -1,13 +1,11 @@
 import 'package:football_points/classes/estado_partida.dart';
+import 'package:football_points/classes/time.dart';
 
 class Jogo {
-  String time = '';
-  EstadoPatida resultado = EstadoPatida.na;
+  Time time = Time(nome: '', escudo: '');
+  EstadoPartida resultado = EstadoPartida.naoSelecionado;
 
-  Jogo(String time, EstadoPatida resultado) {
-    this.time = time;
-    this.resultado = resultado;
-  }
+  Jogo({required this.time, required this.resultado});
 
   @override
   String toString() {

@@ -1,19 +1,22 @@
 import 'dart:convert';
 
+import 'package:football_points/classes/time.dart';
 import 'package:http/http.dart' as http;
 
 class ListaTimes {
-  static List<String> _carregaNomeTimes(String responseBody) {
-    List<String> listaDeTimes = [''];
+  static List<Time> _carregaNomeTimes(String responseBody) {
+    List<Time> listaDeTimes = [Time.toTimeSemEscudo('')];
     List<dynamic> dadosDosTimes = json.decode(responseBody);
-    dadosDosTimes.forEach((dadoTime) {
-      listaDeTimes.add(dadoTime['time']['nome_popular']);
+    dadosDosTimes.forEach((dynamic dadoTime) {
+      String nome = dadoTime['time']['nome_popular'];
+      String escudo = dadoTime['time']['escudo'];
+      listaDeTimes.add(Time(nome: nome, escudo: escudo));
     });
     return listaDeTimes;
   }
 
-  static Future<List<String>> recuperaListaDeTimes() async {
-    List<String> listaDeTimes = [];
+  static Future<List<Time>> recuperaListaDeTimes() async {
+    List<Time> times = [];
     String token = 'test_e7deb0887bf6c9146cc540149b4ea7';
     String url = 'https://api.api-futebol.com.br/v1/campeonatos/2/tabela';
     Uri uri = Uri.parse(url);
@@ -23,12 +26,13 @@ class ListaTimes {
     });
 
     if (response.statusCode == 200) {
-      listaDeTimes = _carregaNomeTimes(response.body);
+      times = _carregaNomeTimes(response.body);
     } else {
-      listaDeTimes.add('Corinthians');
-      listaDeTimes.add('São Paulo');
-      listaDeTimes.add('Cruzeiro');
+      times.add(Time.toTimeSemEscudo(''));
+      times.add(Time.toTimeSemEscudo('Corinthians'));
+      times.add(Time.toTimeSemEscudo('São Paulo'));
+      times.add(Time.toTimeSemEscudo('Cruzeiro'));
     }
-    return listaDeTimes;
+    return times;
   }
 }
